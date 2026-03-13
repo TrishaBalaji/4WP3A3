@@ -48,6 +48,8 @@ router.get("/logout", async function(req, res)
 
 module.exports = router;
 
+//getting a TypeError with the new router.use function. Says it's receiving an object instead 
+//of a middleware
 //added table matching function to login route 
 router.post("/attemptlogin", async function(req, res)
   {
