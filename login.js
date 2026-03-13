@@ -13,30 +13,6 @@ router.get("/", async function(req, res)
   res.render("login", req.TPL);
 });
 
-// Attempts to login a user
-// - The action for the form submit on the login page.
-router.post("/attemptlogin", async function(req, res)
-{
-
-  // is the username and password OK?
-  if (req.body.username == "bob" &&
-      req.body.password == "test")
-  {
-    // set a session key username to login the user
-    req.session.username = req.body.username;
-
-    // re-direct the logged-in user to the members page
-    res.redirect("/members");
-  }
-  else
-  {
-    // if we have an error, reload the login page with an error
-    req.session.login_error = "Invalid username and/or password!";
-    res.redirect("/login");
-  }
-
-});
-
 // Logout a user
 // - Destroys the session key username that is used to determine if a user
 // is logged in, re-directs them to the home page.
@@ -46,17 +22,13 @@ router.get("/logout", async function(req, res)
   res.redirect("/home");
 });
 
-module.exports = router;
-
-//getting a TypeError with the new router.use function. Says it's receiving an object instead 
-//of a middleware
 //added table matching function to login route 
 router.post("/attemptlogin", async function(req, res)
   {
       const username = req.body.username;
       const password = req.body.password;
 
-      const user = await db.matchUsers(username, password);
+      const user = await ArticlesModel.matchUsers(username, password);
 
       if(!user) {
         res.render("login", {
@@ -75,3 +47,7 @@ router.post("/attemptlogin", async function(req, res)
     }
 
   });
+
+module.exports = router;
+
+//fixed TypeError - didn't have 'module.exports = router' in my local file 
