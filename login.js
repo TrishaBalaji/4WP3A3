@@ -47,3 +47,29 @@ router.get("/logout", async function(req, res)
 });
 
 module.exports = router;
+
+//added table matching function to login route 
+router.post("/attemptlogin", async function(req, res)
+  {
+      const username = req.body.username;
+      const password = req.body.password;
+
+      const user = await db.matchUsers(username, password);
+
+      if(!user) {
+        res.render("login", {
+          error: "Invalid username or password!"
+      });
+      return;
+    }
+
+    req.session.user = user;
+
+    if (user.level == "editor") {
+      res.redirect("/editors");
+    } 
+    else {
+      res.redirect("/members");
+    }
+
+  });
