@@ -28,5 +28,15 @@ async function createArticle(article,username)
          [article.title, username, article.content]);
 }
 
+//check table for matching username and password
+async function matchUsers(username, password)
+{
+  let result = await db.get("SELECT username, password FROM Users WHERE username = ? AND password = ?", 
+    [username, password]
+  );
+  return result;
+}
+
 module.exports = {getAllArticles
-                 ,createArticle};
+                 ,createArticle
+                 ,matchUsers};
