@@ -51,3 +51,4 @@ router.post("/attemptlogin", async function(req, res)
 module.exports = router;
 
 //fixed TypeError - didn't have 'module.exports = router' in my local file 
+//new error: trouble redirecting page after clicking login 
