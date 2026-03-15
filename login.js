@@ -27,25 +27,22 @@ router.post("/attemptlogin", async function(req, res)
   {
       const username = req.body.username;
       const password = req.body.password;
+      const level = req.body.level;
 
-      const user = await ArticlesModel.matchUsers(username, password);
-
-      if(!user) {
-        res.render("login", {
-          error: "Invalid username or password!"
-      });
+      const user = await UsersModel.matchUser(username, password, level);
+    
+      if(level == "editor") {
+        res.redirect("/editors");
+      }
+      else if(level == "member") {
+        res.redirect("/members");
+      }
+      else {
+      (req.session.login_error = "Invalid username and/or password!");
+      res.redirect("/login");
+        
       return;
-    }
-
-    req.session.user = user;
-
-    if (user.level == "editor") {
-      res.redirect("/editors");
     } 
-    else {
-      res.redirect("/members");
-    }
-
   });
 
 module.exports = router;
