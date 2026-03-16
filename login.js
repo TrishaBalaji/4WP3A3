@@ -24,7 +24,8 @@ router.get("/logout", async function(req, res)
 });
 
 //attempts to login a user
-//added table matching function to login route 
+//added table matching function to login route
+//resolved login error, it redirects to members and editors pages now
 router.post("/attemptlogin", async function(req, res) 
   {
       console.log("Login attempt started");
