@@ -1,5 +1,6 @@
 const sqlite3 = require("sqlite3").verbose();
 const sqlite = require("sqlite");
+const db = require('../initdb.js');
 
 async function init() {
   try {
@@ -14,14 +15,30 @@ async function init() {
 
 init();
 
-async function matchUser(username, password, level) {
+async function matchUser(username, password) {
 
-  await db.get(
-    "SELECT username, password, level FROM Users WHERE username = ? AND password = ?",
-    [username, password, level]
-  );
+  return new Promise((resolve, reject) => {
 
-  return user;
+    const sql = `
+      SELECT username, level
+      FROM Users
+      WHERE username = ? AND password = ?
+    `;
+
+    db.get(sql, [username, password], function(err, row) {
+
+      if(err) {
+        reject(err);
+      } else {
+        resolve(row); // returns user if found, undefined if not
+      }
+
+    });
+
+  });
+
 }
 
-module.exports = { matchUser };
+module.exports = {
+  matchUser
+};
