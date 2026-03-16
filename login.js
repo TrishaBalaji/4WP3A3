@@ -1,6 +1,7 @@
 const express = require('express');
 var router = express.Router()
 const ArticlesModel = require('../models/articles.js')
+const UsersModel = require('../models/users.js')
 
 // Displays the login page
 router.get("/", async function(req, res)
@@ -22,30 +23,43 @@ router.get("/logout", async function(req, res)
   res.redirect("/home");
 });
 
+//attempts to login a user
 //added table matching function to login route 
-router.post("/attemptlogin", async function(req, res)
+router.post("/attemptlogin", async function(req, res) 
   {
+      console.log("Login attempt started");
       const username = req.body.username;
       const password = req.body.password;
-      const level = req.body.level;
+      try {
+        const user = await UsersModel.matchUser(username, password);
 
-      const user = await UsersModel.matchUser(username, password, level);
-    
-      if(level == "editor") {
-        res.redirect("/editors");
+        if(user) {
+          req.session.username = user.username;
+          if(user.level === "editor") {
+            console.log("Redirecting to editors");
+            res.redirect("/editors");
+          }
+          else if(user.level === "member"){
+            console.log("Redirecting to members");
+            res.redirect("/members");
+          }
+          else {
+            console.log("Invalid login");
+            req.session.login_error = "Invalid username and/or password!";
+            res.redirect("/login");
+          }
+        } else {
+          console.log("No matching user found");
+          req.session.login_error = "Invalid username and/or password!";
+          return res.redirect("/login");
+        }
       }
-      else if(level == "member") {
-        res.redirect("/members");
+      catch(err){
+        console.error(err);
+        req.session.login_error = "Login error occurred";
+        res.redirect("/login");
       }
-      else {
-      (req.session.login_error = "Invalid username and/or password!");
-      res.redirect("/login");
-        
-      return;
-    } 
-  });
 
-module.exports = router;
+  }); 
 
-//fixed TypeError - didn't have 'module.exports = router' in my local file 
-//new error: trouble redirecting page after clicking login 
+  module.exports = router;
