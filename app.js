@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const session = require('express-session');
 const mustacheExpress = require('mustache-express');
+const fs = require('fs');
+const path = require('path');
 
 // Include the mustache engine to help us render our pages
 app.engine("mustache", mustacheExpress());
@@ -29,6 +31,29 @@ app.use(function(req,res,next) {
 
   next();
 });
+
+//middleware for log.txt
+function logMiddleware(req, res, next) {
+    const logFilePath = path.join(__dirname, 'log.txt');
+
+    const dateTime = new Date().toISOString(); 
+    const pathRequested = req.path;
+    const ip = req.ip;
+    const query = JSON.stringify(req.query);
+    const body = JSON.stringify(req.body);
+
+    const logLine = `${dateTime}, ${pathRequested}, ${ip}, ${query}, ${body}\n`;
+
+    fs.appendFile(logFilePath, logLine, (err) => {
+        if (err) {
+            console.error("Error writing to log file:", err);
+        }
+    });
+
+    next();
+}
+
+app.use(logMiddleware);
 
 // Create middlewares for setting up navigational highlighting
 // - we could condense this significantly, for example by having one middleware
