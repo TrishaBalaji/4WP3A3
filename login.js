@@ -20,6 +20,7 @@ router.get("/", async function(req, res)
 router.get("/logout", async function(req, res)
 {
   delete(req.session.username);
+  delete(req.session.level);
   res.redirect("/home");
 });
 
@@ -36,6 +37,7 @@ router.post("/attemptlogin", async function(req, res)
 
         if(user) {
           req.session.username = user.username;
+          req.session.level = user.level;
           if(user.level === "editor") {
             console.log("Redirecting to editors");
             res.redirect("/editors");
