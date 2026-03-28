@@ -57,6 +57,8 @@ app.use(logMiddleware);
 
 //error with directing editor level members to editors page 
 //getting a TypeError: where level is undefined 
+//error fixed, req.session.user.level was undefined 
+
 //middleware for restricting editor access 
 function editor(req, res, next) {
     // Check whether a user is logged in
@@ -65,7 +67,7 @@ function editor(req, res, next) {
     }
 
     // Check whether the logged-in user is an editor
-    if (req.session.user.level !== "editor") {
+    if (req.session.level !== "editor") {
         return res.redirect("/home");
     }
 
