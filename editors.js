@@ -1,6 +1,7 @@
 const express = require('express');
 var router = express.Router()
-const editor = require('.app.js'); //error opening file from folder 
+const editor = require('../app.js'); //error opening file from folder 
+//update fixed file structure, no more module not found error 
 
 // Display the editors page
 router.get("/", editor, async function(req, res)
