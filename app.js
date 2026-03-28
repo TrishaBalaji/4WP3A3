@@ -55,6 +55,26 @@ function logMiddleware(req, res, next) {
 
 app.use(logMiddleware);
 
+//error with directing editor level members to editors page 
+//getting a TypeError: where level is undefined 
+//middleware for restricting editor access 
+function editor(req, res, next) {
+    // Check whether a user is logged in
+    if (!req.session || !req.session.username) {
+        return res.redirect("/home");
+    }
+
+    // Check whether the logged-in user is an editor
+    if (req.session.user.level !== "editor") {
+        return res.redirect("/home");
+    }
+
+    // User is logged in and is an editor
+    next();
+}
+
+module.exports = editor;
+
 // Create middlewares for setting up navigational highlighting
 // - we could condense this significantly, for example by having one middleware
 // that looks at the URL and decides based on a configuration array... but it
