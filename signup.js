@@ -20,5 +20,20 @@ router.post("/", (req, res) => {
         req.TPL.error = "Username/password cannot be less than 6 characters in length!";
         return res.render("signup", req.TPL);
     }
+    
+    //insert new user into database
+    db.run(
+        "INSERT INTO Users VALUES (?,?,?)",
+        [username, password, "member"],
+        function(err) {
+            if (err) {
+                req.TPL.error = "Error creating account.";
+                return res.render("signup", req.TPL);
+            }
+
+            req.TPL.success = true;
+            return res.render("signup", req.TPL);
+        }
+    );
   });
 module.exports = router; 
