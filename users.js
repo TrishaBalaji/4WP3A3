@@ -2,36 +2,39 @@ const sqlite3 = require("sqlite3").verbose();
 const sqlite = require("sqlite");
 const db = require('../initdb.js');
 
-async function init() {
-  try {
-    db = await sqlite.open({
-      filename: 'database.db',
-      driver: sqlite3.Database
-    });
-  } catch(err) {
-      console.error(err);
-  }
-}
-
-init();
-
 async function matchUser(username, password) {
 
   return new Promise((resolve, reject) => {
 
     const sql = `
-      SELECT username, level
+      SELECT username, password, level
       FROM Users
-      WHERE username = ? AND password = ?
+      WHERE username = ? 
     `;
 
-    db.get(sql, [username, password], function(err, row) {
+    db.get(sql, [username], async function(err, row) {
 
       if(err) {
         reject(err);
       } else {
         resolve(row); // returns user if found, undefined if not
       }
+
+      try {
+        const passwordMatches = await bcrypt.compare(password, row.password);
+
+        if(!passwordMatches) {
+            return resolve(undefined);
+        }
+        resolve ({
+          username: row.username,
+          level: row.level
+        });
+      }
+      catch (compareErr) {
+        reject(compareErr);
+      }
+
 
     });
 
