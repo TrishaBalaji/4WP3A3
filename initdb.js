@@ -1,11 +1,18 @@
 const sqlite3 = require("sqlite3").verbose();
 var db = new sqlite3.Database("database.db");
+const bcrypt = require("bcrypt");
 
-db.serialize(function(){
+db.serialize(async function(){
 
   // Create an initial table of users
   db.run("DROP TABLE IF EXISTS Users");
-  db.run("CREATE TABLE Users (username TEXT, password TEXT, level TEXT)");
+  db.run("CREATE TABLE IF NOT EXISTS Users (username TEXT, password TEXT, level TEXT)");
+  
+  const mem1Hash = await bcrypt.hash("mem1", 10);
+  const mem2Hash = await bcrypt.hash("mem2", 10);
+  const edit1Hash = await bcrypt.hash("edit1", 10);
+  const edit2Hash = await bcrypt.hash("edit2", 10);
+  
   db.run("INSERT INTO Users VALUES (?,?,?)", ['mem1', 'mem1', 'member']);
   db.run("INSERT INTO Users VALUES (?,?,?)", ['mem2', 'mem2', 'editor']);
   db.run("INSERT INTO Users VALUES (?,?,?)", ['edit1', 'edit1', 'editor']);
@@ -13,7 +20,9 @@ db.serialize(function(){
 
   // create an initial table of articles
   db.run("DROP TABLE IF EXISTS Articles");
-  db.run("CREATE TABLE Articles (title TEXT, username TEXT, content TEXT)");
+  db.run("CREATE TABLE IF NOT EXISTS Articles (title TEXT, username TEXT, content TEXT)", (err) => {
+    if (err) console.log("Error creating Articles:", err);
+    else console.log("Articles table ready");
   db.run("INSERT INTO Articles VALUES (?,?,?)",
           ["My favourite places to eat",
            "mem1",
